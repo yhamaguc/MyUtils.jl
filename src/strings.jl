@@ -1,4 +1,4 @@
-function camel_to_snake(s::AbstractString)
+function cameltosnake(s::AbstractString)
     matches = [m.match for m in eachmatch(r"([A-Z][a-z]+)", s)]
     for m in matches
         s = replace(s, m => "_" * m)
@@ -11,9 +11,6 @@ function camel_to_snake(s::AbstractString)
 end
 
 
-function na2missing(x::Union{Missing, AbstractString})
-    if ismissing(x)
-        return (missing)
-    end
+function natomissing(x::AbstractString)
     return (strip(x) == "NA" ? missing : x)
 end

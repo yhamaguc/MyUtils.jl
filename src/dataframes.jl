@@ -1,4 +1,4 @@
-function nest(x::AbstractDataFrame)
+function nest(x::GroupedDataFrame{DataFrame})
     _df = DataFrame(keys(x))
     @transform(
         _df,
@@ -22,7 +22,7 @@ function unnest(x::AbstractDataFrame, column=:data)
 end
 
 
-function group_concat(x::AbstractDataFrame, delimiter=";"; makesorted=false, makeunique=false)
+function groupconcat(x, delimiter=";"; makesorted=false, makeunique=false)
     if (all(ismissing(x)))
         return missing
     end
