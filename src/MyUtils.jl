@@ -6,5 +6,5 @@ module MyUtils
     include("paths.jl")
     include("strings.jl")
 
-    export nest, unnest, groupconcat, here, cameltosnake, natomissing
+    export nest, unnest, groupconcat, here, cameltosnake, tomissing
 end

@@ -11,6 +11,6 @@ function cameltosnake(s::AbstractString)
 end
 
 
-function natomissing(x::AbstractString)
-    return (strip(x) == "NA" ? missing : x)
+function tomissing(s::AbstractString, target="")
+    return (strip(s) == target ? missing : s)
 end
