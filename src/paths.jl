@@ -17,7 +17,7 @@ function here()
         pwd_ = parent_
     end
 
-    return nothing
+    return pwd()
 end
 
 
@@ -33,4 +33,8 @@ end
 
 function here(x::Vector{String})
     return [joinpath(here(), i) for i in x]
+end
+
+function fromhere(s::AbstractString)
+    return replace(s, here() => ".")
 end

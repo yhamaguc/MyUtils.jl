@@ -11,6 +11,15 @@ function cameltosnake(s::AbstractString)
 end
 
 
-function tomissing(s::AbstractString, target="")
-    return (strip(s) == target ? missing : s)
+function tomissing(s::AbstractString, from="")
+    return (strip(s) == from ? missing : s)
+end
+
+
+function frommissing(x::Any, to="")
+    if !ismissing(x)
+        return x
+    end
+
+    return to
 end
