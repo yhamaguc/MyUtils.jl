@@ -1,5 +1,5 @@
 function unite(X::AbstractDataFrame, column_to, columns_from, sep="-"; drop=true)
-    _value = (x) -> String.(X[!, x])
+    _value = (x) -> string.(X[!, x])
     _values = [_value(c) for c in columns_from]
 
     _concat = (x, y) -> x .* sep .* y
@@ -16,24 +16,47 @@ function unite(X::AbstractDataFrame, column_to, columns_from, sep="-"; drop=true
 end
 
 
-function nest(X::GroupedDataFrame{DataFrame}, column=:data)
+function nest(X::GroupedDataFrame{DataFrame}, coluymn=:data)
     _nested = DataFrame(keys(X))
-    _nested[!, column] = map(X -> select(DataFrame(X), Not(names(_nested))), collect(X))
+    _nested[!, coluymn] = map(X -> select(DataFrame(X), Not(names(_nested))), collect(X))
 
     return _nested
 end
 
 
-function unnest(X::AbstractDataFrame, column=:data)
-    _f = typeof(first(X[:, column])) == DataFrame ? nrow : length
+function unnest(X::AbstractDataFrame, columns=[:data])
+    if !isa(columns, AbstractVector)
+        columns = [columns]
+    end
 
-    _nvalues = _f.(X[:, column])
-    _keys_grouped = select(X, Not(column))
+    _n = (x) -> size(x)[1]
+    _ntimes = _n.(X[:, columns[1]])
+
+    # TODO:
+    # Check target columns content length
+    # _nisnotequal = nrow(@rsubset(transform(_nvalues, columns => ByRow(==) => :isequal), !:isequal))
+
+    # if _nisnotequal > 0
+    #     @info "Unnesting data lengths are not equal"
+    #     return missing
+    # end
+
+    _keys = select(X, Not(columns))
     _unnested = reduce(
         vcat,
-        [repeat(DataFrame(k), n) for (k, n) in zip(eachrow(_keys_grouped), _nvalues)]
+        [repeat(DataFrame(k), n) for (k, n) in zip(eachrow(_keys), _ntimes)]
     )
-    _data = reduce(vcat, (X[!, column]))
+
+    if length(columns) > 1
+        _data =  @chain X[!, columns] begin
+            transform(columns => ByRow(hcat) => :data)
+            select(:data)
+        end
+
+        _data = reduce(vcat, _data.data)
+    else
+        _data = reduce(vcat, X[!, columns...])
+    end
 
     _unnested = hcat(_unnested, _data)
 
@@ -41,6 +64,7 @@ function unnest(X::AbstractDataFrame, column=:data)
 end
 
 
+# NOTE: Used in combine clause
 function groupconcat(x, delimiter=";"; makesorted=false, makeunique=false)
     if (all(ismissing(x)))
         return missing
@@ -56,6 +80,10 @@ function groupconcat(x, delimiter=";"; makesorted=false, makeunique=false)
 end
 
 
+# NOTE: Used in combine clause
+representative = x -> x[begin]
+
+
 function deframe(X::AbstractDataFrame)
     NamedArray(X[!, 2], X[!, 1])
 end
@@ -63,4 +91,9 @@ end
 
 function enframe(x)
     DataFrame(name = names(x)[1], value = values(x))
+end
+
+
+function renametolower!(X::AbstractDataFrame)
+    rename!(X, lowercase.(names(X)))
 end

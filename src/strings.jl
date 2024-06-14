@@ -16,6 +16,11 @@ function tomissing(s::AbstractString, from="")
 end
 
 
+function tonan(s::AbstractString, from="")
+    return (strip(s) == from ? NaN : s)
+end
+
+
 function frommissing(x::Any, to="")
     if !ismissing(x)
         return x
