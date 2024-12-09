@@ -16,9 +16,9 @@ function unite(X::AbstractDataFrame, column_to, columns_from, sep="-"; drop=true
 end
 
 
-function nest(X::GroupedDataFrame{DataFrame}, coluymn=:data)
+function nest(X::GroupedDataFrame{DataFrame}, column=:data)
     _nested = DataFrame(keys(X))
-    _nested[!, coluymn] = map(X -> select(DataFrame(X), Not(names(_nested))), collect(X))
+    _nested[!, column] = map(X -> select(DataFrame(X), Not(names(_nested))), collect(X))
 
     return _nested
 end
@@ -85,12 +85,12 @@ representative = x -> x[begin]
 
 
 function deframe(X::AbstractDataFrame)
-    NamedArray(X[!, 2], X[!, 1])
+    Dict(k => v for (k, v) in zip(X[!, 1], X[!, 2]))
 end
 
 
-function enframe(x)
-    DataFrame(name = names(x)[1], value = values(x))
+function enframe(d::Union{AbstractDict, Counter})
+    DataFrame(:name => collect(keys(d)), :value => collect(values(d)))
 end
 
 

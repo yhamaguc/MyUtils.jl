@@ -2,6 +2,7 @@ module MyUtils
     using DataFrames
     using DataFramesMeta
     using Statistics
+    using Counters
 
     include("dataframes.jl")
     include("paths.jl")
